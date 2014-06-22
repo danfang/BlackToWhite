@@ -71,7 +71,7 @@ public class Grid {
      * @param panelPressed desired panel to change
      */
     private void changePanels(int panelPressed, boolean record) {
-        int totalGridDimensions = grid.length * grid.length;
+        int totalGridDimensions = GRID_SIZE * GRID_SIZE;
         int panelAbove = panelPressed - GRID_SIZE;
         int panelBelow = panelPressed + GRID_SIZE;
         int panelRight = panelPressed + 1;
@@ -82,10 +82,10 @@ public class Grid {
         if (panelBelow < totalGridDimensions) {
             changeSinglePanel(panelBelow);
         }
-        if (panelRight % grid.length != 0 && panelRight < totalGridDimensions){
+        if (panelRight % GRID_SIZE != 0 && panelRight < totalGridDimensions){
             changeSinglePanel(panelRight);
         }
-        if (panelPressed % grid.length != 0 && panelLeft >= 0){
+        if (panelPressed % GRID_SIZE != 0 && panelLeft >= 0){
             changeSinglePanel(panelLeft);
         }
         changeSinglePanel(panelPressed);
