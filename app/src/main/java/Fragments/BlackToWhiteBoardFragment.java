@@ -13,7 +13,9 @@ import Internal.Grid;
 import Internal.Panel;
 
 /**
- * Created by Justin on 6/20/2014.
+ * Justin Harjanto and Daniel Fang
+ * Created 6/21/2014
+ * BlackToWhite Fragment
  */
 public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickListener{
     private Grid g;

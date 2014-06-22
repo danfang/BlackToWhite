@@ -7,7 +7,9 @@ import android.widget.Button;
 import java.util.Random;
 
 /**
- * Created by Justin Harjanto on 6/20/2014.
+ * Justin Harjanto and Daniel Fang
+ * Created 6/20/2014
+ * BlackToWhite Panel
  */
 public class Panel {
     private Button panel;

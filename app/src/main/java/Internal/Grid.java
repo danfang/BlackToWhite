@@ -10,7 +10,9 @@ import com.blacktowhite.R;
 import java.util.Stack;
 
 /**
- * Created by Justin on 6/21/2014.
+ * Justin Harjanto and Daniel Fang
+ * Created 6/21/2014
+ * Black To White Grid
  */
 public class Grid {
     private Panel[][] grid;
@@ -20,6 +22,7 @@ public class Grid {
     private Stack<Integer> moves;
     private MediaPlayer m;
     private int numberOfMoves;
+    private int stuckLength;
 
     public Grid(){
         grid = new Panel[GRID_SIZE][GRID_SIZE];
@@ -101,31 +104,69 @@ public class Grid {
 
 
     /**
-     * Runs through one iteration of the solution algorithm.
+     * Runs the @solveIter() method until the board is solved
      */
     public void solve() {
-        while (!isSolved() && numberOfMoves < 1000) {
-            int max = -99;
-            int index = -1;
-            for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
-                int netTiles = analyze(i);
-                if (netTiles > max && !moves.isEmpty() && i != moves.peek()) {
-                    index = i;
-                    max = netTiles;
-                }
-            }
-
-            if (index == -1) {
-                index = (int) Math.random() * (GRID_SIZE * GRID_SIZE - 1);
-            }
-            changePanels(index, true);
-            numberOfMoves++;
+        while (!isSolved()) {
+            solveIter();
         }
-        Log.d("solved", "" + numberOfMoves);
-        generateBoard();
+        Log.d("solved", isSolved() + ": " + numberOfMoves);
         numberOfMoves = 0;
+        moves.clear();
+        generateBoard();
     }
 
+    /**
+     * Runs through one iteration of the solving algorithm, which
+     * combines minimax pruning and resorts to randomization in
+     * infinite-loop situations
+     */
+    private void solveIter() {
+        int max = -99;
+        int index = -1;
+
+        // analyzing each move to see which yields the least net black tiles
+        for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+            int netTiles = analyze(i);
+            if (netTiles > max && !moves.isEmpty() && i != moves.peek()) {
+                index = i;
+                max = netTiles;
+            }
+        }
+
+        // counts the number of black tiles on the board
+        int blackTiles = 0;
+        for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+            if (isBlack(i) == 1) {
+                blackTiles++;
+            }
+        }
+
+        // if there are two black tiles on the board, the board might be stuck in
+        // an infinite loop
+        if (blackTiles == 2) {
+            stuckLength++;
+        } else {
+            stuckLength = 0;
+        }
+
+        // if a loop is detected (stuck for > 3 cycles), breaks the cycle
+        if (stuckLength >= 3) {
+            changePanels(4, true);
+            changePanels(8, true);
+            stuckLength = 0;
+        } else if (index == -1) { // if no suitable index is found, chooses a random tile
+            changePanels((int) Math.random() * (GRID_SIZE * GRID_SIZE - 1), true);
+        } else {                  // otherwise, switches the minimax-determined tile
+            changePanels(index, true);
+        }
+        numberOfMoves++;
+    }
+
+    /**
+     * Checks the history of moves and undoes the most recent move
+     * (if any have been made)
+     */
     public void undo() {
         if (!moves.isEmpty()) {
             int move = moves.pop();

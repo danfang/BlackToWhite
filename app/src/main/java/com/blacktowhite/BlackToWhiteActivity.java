@@ -1,21 +1,17 @@
 package com.blacktowhite;
 
 import android.app.Activity;
-import android.app.ActionBar;
-import android.app.Fragment;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
-
-import com.blacktowhite.R;
 
 import Fragments.BlackToWhiteBoardFragment;
 
-
+/**
+ * Justin Harjanto and Daniel Fang
+ * Created 6/21/2014
+ * BlackToWhite Main Activity
+ */
 public class BlackToWhiteActivity extends Activity {
 
     @Override
