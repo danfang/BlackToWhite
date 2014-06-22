@@ -17,6 +17,7 @@ import Internal.Panel;
  */
 public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickListener{
     private Grid g;
+    private boolean DEBUG_MODE = true;
 
 
     @Override
@@ -25,13 +26,27 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
         g = new Grid();
         initializeGrid(v);
 
-        Button b = (Button) v.findViewById(R.id.solvebutton);
-        b.setOnClickListener(new View.OnClickListener() {
+        Button solve = (Button) v.findViewById(R.id.solvebutton);
+        solve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 g.solve();
             }
         });
+
+        Button undo = (Button) v.findViewById(R.id.undobutton);
+        undo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                g.undo();
+            }
+        });
+
+        if (!DEBUG_MODE) {
+            solve.setVisibility(View.INVISIBLE);
+            undo.setVisibility(View.INVISIBLE);
+        }
+
         return v;
     }
 

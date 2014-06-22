@@ -7,6 +7,8 @@ import android.view.View;
 
 import com.blacktowhite.R;
 
+import java.util.Stack;
+
 /**
  * Created by Justin on 6/21/2014.
  */
@@ -15,9 +17,11 @@ public class Grid {
     private static final int GRID_SIZE = 3;
     private static final int MIN_BLACK_TILES = 2;
     private static final int MIN_WHITE_TILES = 2;
+    private Stack<Integer> moves;
 
     public Grid(){
         grid = new Panel[GRID_SIZE][GRID_SIZE];
+        moves = new Stack<Integer>();
     }
 
     /**
@@ -52,7 +56,7 @@ public class Grid {
      */
     public void changePanels(View v){
         int panelPressed = identifyPanel(v);
-        changePanels(panelPressed);
+        changePanels(panelPressed, true);
 
         if(isSolved()){ // Check and generate a new board if it's solved.
             MediaPlayer m = MediaPlayer.create(v.getContext(), R.raw.shinyding);
@@ -66,7 +70,7 @@ public class Grid {
      * adjacent to the panel.
      * @param panelPressed desired panel to change
      */
-    private void changePanels(int panelPressed) {
+    private void changePanels(int panelPressed, boolean record) {
         int totalGridDimensions = grid.length * grid.length;
         int panelAbove = panelPressed - 3;
         int panelBelow = panelPressed + 3;
@@ -85,6 +89,9 @@ public class Grid {
             changeSinglePanel(panelLeft);
         }
         changeSinglePanel(panelPressed);
+        if (record) {
+            moves.push(panelPressed);
+        }
     }
 
 
@@ -92,9 +99,16 @@ public class Grid {
      * Runs through one iteration of the solution algorithm.
      */
     public void solve() {
-        changePanels((int) (Math.random() * 8));
+        changePanels((int) (Math.random() * 8), true);
         if (isSolved()) {
             Log.d("solved", "true");
+        }
+    }
+
+    public void undo() {
+        if (!moves.isEmpty()) {
+            int move = moves.pop();
+            changePanels(move, false);
         }
     }
 

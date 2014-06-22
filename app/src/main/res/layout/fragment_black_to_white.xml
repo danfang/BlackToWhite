@@ -98,5 +98,16 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Undo"
+        android:id="@+id/undobutton"
+        android:layout_below="@+id/solvebutton"
+        android:layout_alignLeft="@+id/solvebutton"
+        android:layout_alignStart="@+id/solvebutton"
+        android:layout_alignRight="@+id/solvebutton"
+        android:layout_alignEnd="@+id/solvebutton" />
+
 
 </RelativeLayout>
