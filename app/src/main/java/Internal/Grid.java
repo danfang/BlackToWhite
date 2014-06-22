@@ -2,7 +2,6 @@ package Internal;
 
 import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 
@@ -48,12 +47,26 @@ public class Grid {
     }
 
     /**
-     * Changes the current panel from white to black or black to white along with the tiles
-     * adjacent to the panel.
+     * Responds to a button press and changes the according panels
      * @param v View passed in representing the Button pressed.
      */
     public void changePanels(View v){
         int panelPressed = identifyPanel(v);
+        changePanels(panelPressed);
+
+        if(isSolved()){ // Check and generate a new board if it's solved.
+            MediaPlayer m = MediaPlayer.create(v.getContext(), R.raw.shinyding);
+            m.start();
+            generateBoard();
+        }
+    }
+
+    /**
+     * Changes the current panel from white to black or black to white along with the tiles
+     * adjacent to the panel.
+     * @param panelPressed desired panel to change
+     */
+    private void changePanels(int panelPressed) {
         int totalGridDimensions = grid.length * grid.length;
         int panelAbove = panelPressed - 3;
         int panelBelow = panelPressed + 3;
@@ -72,10 +85,16 @@ public class Grid {
             changeSinglePanel(panelLeft);
         }
         changeSinglePanel(panelPressed);
-        if(isSolved()){ // Check and generate a new board if it's solved.
-            MediaPlayer m = MediaPlayer.create(v.getContext(), R.raw.shinyding);
-            m.start();
-            generateBoard();
+    }
+
+
+    /**
+     * Runs through one iteration of the solution algorithm.
+     */
+    public void solve() {
+        changePanels((int) (Math.random() * 8));
+        if (isSolved()) {
+            Log.d("solved", "true");
         }
     }
 

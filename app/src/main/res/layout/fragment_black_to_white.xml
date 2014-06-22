@@ -90,6 +90,13 @@
         android:layout_alignLeft="@+id/panel6"
         android:layout_alignStart="@+id/panel6" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Solve!"
+        android:id="@+id/solvebutton"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>

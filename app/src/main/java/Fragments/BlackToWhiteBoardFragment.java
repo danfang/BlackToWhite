@@ -24,6 +24,14 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
         View v = inflater.inflate(R.layout.fragment_black_to_white, container, false);
         g = new Grid();
         initializeGrid(v);
+
+        Button b = (Button) v.findViewById(R.id.solvebutton);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                g.solve();
+            }
+        });
         return v;
     }
 
