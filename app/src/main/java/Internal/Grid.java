@@ -18,6 +18,8 @@ public class Grid {
     private static final int MIN_BLACK_TILES = 2;
     private static final int MIN_WHITE_TILES = 2;
     private Stack<Integer> moves;
+    private MediaPlayer m;
+    private int numberOfMoves;
 
     public Grid(){
         grid = new Panel[GRID_SIZE][GRID_SIZE];
@@ -59,8 +61,11 @@ public class Grid {
         changePanels(panelPressed, true);
 
         if(isSolved()){ // Check and generate a new board if it's solved.
-            MediaPlayer m = MediaPlayer.create(v.getContext(), R.raw.shinyding);
+            if (m == null) {
+                m = MediaPlayer.create(v.getContext(), R.raw.shinyding);
+            }
             m.start();
+            m.reset();
             generateBoard();
         }
     }
@@ -99,20 +104,26 @@ public class Grid {
      * Runs through one iteration of the solution algorithm.
      */
     public void solve() {
-        changePanels((int) (Math.random() * 8), true);
-        if (isSolved()) {
-            Log.d("solved", "true");
-        }
-        int max = 0;
-        int index = 0;
-        for(int i = 0; i < GRID_SIZE * GRID_SIZE; i++){
-            int netTiles = analyze(i);
-            if(netTiles > max){
-                index = i;
-                max = netTiles;
+        while (!isSolved() && numberOfMoves < 1000) {
+            int max = -99;
+            int index = -1;
+            for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+                int netTiles = analyze(i);
+                if (netTiles > max && !moves.isEmpty() && i != moves.peek()) {
+                    index = i;
+                    max = netTiles;
+                }
             }
+
+            if (index == -1) {
+                index = (int) Math.random() * (GRID_SIZE * GRID_SIZE - 1);
+            }
+            changePanels(index, true);
+            numberOfMoves++;
         }
-        changePanels(index, true);
+        Log.d("solved", "" + numberOfMoves);
+        generateBoard();
+        numberOfMoves = 0;
     }
 
     public void undo() {

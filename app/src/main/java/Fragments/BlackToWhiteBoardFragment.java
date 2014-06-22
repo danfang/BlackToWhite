@@ -42,6 +42,14 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
             }
         });
 
+        Button reset = (Button) v.findViewById(R.id.resetbutton);
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                g.generateBoard();
+            }
+        });
+
         if (!DEBUG_MODE) {
             solve.setVisibility(View.INVISIBLE);
             undo.setVisibility(View.INVISIBLE);
