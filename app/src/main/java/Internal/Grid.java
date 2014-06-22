@@ -72,8 +72,8 @@ public class Grid {
      */
     private void changePanels(int panelPressed, boolean record) {
         int totalGridDimensions = grid.length * grid.length;
-        int panelAbove = panelPressed - 3;
-        int panelBelow = panelPressed + 3;
+        int panelAbove = panelPressed - GRID_SIZE;
+        int panelBelow = panelPressed + GRID_SIZE;
         int panelRight = panelPressed + 1;
         int panelLeft = panelPressed - 1;
         if (panelAbove >= 0) {
@@ -103,6 +103,16 @@ public class Grid {
         if (isSolved()) {
             Log.d("solved", "true");
         }
+        int max = 0;
+        int index = 0;
+        for(int i = 0; i < GRID_SIZE * GRID_SIZE; i++){
+            int netTiles = analyze(i);
+            if(netTiles > max){
+                index = i;
+                max = netTiles;
+            }
+        }
+        changePanels(index, true);
     }
 
     public void undo() {
@@ -182,6 +192,39 @@ public class Grid {
                     }
                 }
             }
+        }
+    }
+
+    private int analyze(int panelNumber){
+        int totalNetGain = 0;
+        int totalGridDimensions = grid.length * grid.length;
+        int panelAbove = panelNumber - GRID_SIZE;
+        int panelBelow = panelNumber + GRID_SIZE;
+        int panelRight = panelNumber + 1;
+        int panelLeft = panelNumber - 1;
+        if (panelAbove >= 0) {
+            totalNetGain += isBlack(panelAbove);
+        }
+        if (panelBelow < totalGridDimensions) {
+            totalNetGain += isBlack(panelBelow);
+        }
+        if (panelRight % grid.length != 0 && panelRight < totalGridDimensions){
+            totalNetGain += isBlack(panelRight);
+        }
+        if (panelNumber % grid.length != 0 && panelLeft >= 0){
+            totalNetGain += isBlack(panelLeft);
+        }
+        totalNetGain += isBlack(panelNumber);
+        return totalNetGain;
+    }
+
+    private int isBlack(int panelNumber){
+        int row = panelNumber / GRID_SIZE;
+        int col = panelNumber % GRID_SIZE;
+        if(grid[row][col].getColor()){
+            return -1;
+        } else {
+            return 1;
         }
     }
 
