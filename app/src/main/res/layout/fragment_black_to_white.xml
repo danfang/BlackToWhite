@@ -117,5 +117,15 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/loadboardedittext"
+        android:layout_above="@+id/resetbutton"
+        android:layout_alignLeft="@+id/panel7"
+        android:layout_alignStart="@+id/panel7"
+        android:layout_alignRight="@+id/panel9"
+        android:layout_alignEnd="@+id/panel9" />
+
 
 </RelativeLayout>

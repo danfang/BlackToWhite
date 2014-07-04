@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.blacktowhite.R;
 
@@ -21,6 +22,10 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
     private Grid g;
     private boolean DEBUG_MODE = true;
 
+    private Button solve;
+    private Button undo;
+    private Button reset;
+    private EditText loadGrid;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -28,7 +33,9 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
         g = new Grid();
         initializeGrid(v);
 
-        Button solve = (Button) v.findViewById(R.id.solvebutton);
+        loadGrid = (EditText) v.findViewById(R.id.loadboardedittext);
+
+        solve = (Button) v.findViewById(R.id.solvebutton);
         solve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -36,7 +43,7 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
             }
         });
 
-        Button undo = (Button) v.findViewById(R.id.undobutton);
+        undo = (Button) v.findViewById(R.id.undobutton);
         undo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -44,17 +51,24 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
             }
         });
 
-        Button reset = (Button) v.findViewById(R.id.resetbutton);
+        reset = (Button) v.findViewById(R.id.resetbutton);
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                g.generateBoard();
+                String id = loadGrid.getText().toString();
+                if (id != "") {
+                    g.generateBoard(id);
+                    loadGrid.setText("");
+                } else {
+                    g.generateBoard();
+                }
             }
         });
 
         if (!DEBUG_MODE) {
             solve.setVisibility(View.INVISIBLE);
             undo.setVisibility(View.INVISIBLE);
+            loadGrid.setVisibility(View.INVISIBLE);
         }
 
         return v;

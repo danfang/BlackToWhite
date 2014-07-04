@@ -80,4 +80,17 @@ public class Panel {
         isWhite = !isWhite;
     }
 
+    /**
+     * Set method to change color of the panel to the given boolean
+     * @param isWhite boolean to specify the color of the panel
+     */
+    protected void changeColor(boolean isWhite) {
+        this.isWhite = isWhite;
+        if (isWhite) {
+            panel.setBackgroundColor(Color.WHITE);
+        } else {
+            panel.setBackgroundColor(Color.BLACK);
+        }
+    }
+
 }

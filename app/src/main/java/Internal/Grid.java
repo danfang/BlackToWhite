@@ -22,7 +22,8 @@ public class Grid {
     private Stack<Integer> moves;
     private MediaPlayer m;
     private int numberOfMoves;
-    private int stuckLength;
+
+    private int stuckLength; // preliminary cycle detection variable
 
     public Grid(){
         grid = new Panel[GRID_SIZE][GRID_SIZE];
@@ -207,6 +208,22 @@ public class Grid {
     }
 
     /**
+     * Generates a board based on the given board state
+     * @param id String representation of the board state
+     */
+    public void generateBoard(String id) {
+        if (id.length() != GRID_SIZE * GRID_SIZE) {
+            generateBoard();
+        } else {
+            for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+                int row = i / GRID_SIZE;
+                int col = i % GRID_SIZE;
+                boolean isWhite = id.charAt(i) == '0';
+                grid[row][col].changeColor(isWhite);
+            }
+        }
+    }
+    /**
      * Says whether or not if the board is already solved.
      * @return boolean representing if the board is already solved (all white), false if not
      */
@@ -247,6 +264,11 @@ public class Grid {
         }
     }
 
+    /**
+     * Calculates the net gain of selecting the given panel
+     * @param panelNumber the desired panel
+     * @return (#black panels - #white panels), net gain
+     */
     private int analyze(int panelNumber){
         int totalNetGain = 0;
         int totalGridDimensions = grid.length * grid.length;
@@ -270,6 +292,11 @@ public class Grid {
         return totalNetGain;
     }
 
+    /**
+     * Used to describe the net gain of a tile
+     * @param panelNumber
+     * @return 1 for a black panel, -1 for a white panel
+     */
     private int isBlack(int panelNumber){
         int row = panelNumber / GRID_SIZE;
         int col = panelNumber % GRID_SIZE;
@@ -278,6 +305,24 @@ public class Grid {
         } else {
             return 1;
         }
+    }
+
+    /**
+     * Stringifies the board into a series of 0s and 1s for white and black, respectively
+     * @return the String id for the current board
+     */
+    public String toString() {
+        String id = "";
+        for(Panel[] row : grid){
+            for(Panel p : row){
+                if(p.getColor()){ // If the panel is white...
+                    id+= "0";
+                } else {
+                    id+= "1";
+                }
+            }
+        }
+        return id;
     }
 
 }
