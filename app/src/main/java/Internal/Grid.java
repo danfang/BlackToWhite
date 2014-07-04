@@ -2,6 +2,7 @@ package Internal;
 
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 
@@ -25,10 +26,32 @@ public class Grid {
 
     private int stuckLength; // preliminary cycle detection variable
 
+    private Runnable runSolveAlgorithm;
+    private Handler handleRunnable;
+    private final int SOLVE_DELAY = 100;
+
     public Grid(){
         grid = new Panel[GRID_SIZE][GRID_SIZE];
         moves = new Stack<Integer>();
+
+        handleRunnable = new Handler();
+        runSolveAlgorithm = new Runnable() {
+            @Override
+            public void run() {
+                solveIter();
+                if (!isSolved()) {
+                    handleRunnable.postDelayed(this, SOLVE_DELAY);
+                } else {
+                    Log.d("solved", numberOfMoves + " moves made.");
+                    numberOfMoves = 0;
+                    moves.clear();
+                }
+            }
+        };
+
+
     }
+
 
     /**
      * Get method for retrieving the grid.
@@ -108,13 +131,7 @@ public class Grid {
      * Runs the @solveIter() method until the board is solved
      */
     public void solve() {
-        while (!isSolved()) {
-            solveIter();
-        }
-        Log.d("solved", isSolved() + ": " + numberOfMoves);
-        numberOfMoves = 0;
-        moves.clear();
-        generateBoard();
+        handleRunnable.postDelayed(runSolveAlgorithm, SOLVE_DELAY);
     }
 
     /**
@@ -122,7 +139,7 @@ public class Grid {
      * combines minimax pruning and resorts to randomization in
      * infinite-loop situations
      */
-    private void solveIter() {
+    public void solveIter() {
         int max = -99;
         int index = -1;
 

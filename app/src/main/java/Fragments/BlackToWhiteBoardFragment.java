@@ -25,6 +25,7 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
     private Button solve;
     private Button undo;
     private Button reset;
+    private Button itr;
     private EditText loadGrid;
 
     @Override
@@ -40,6 +41,14 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
             @Override
             public void onClick(View view) {
                 g.solve();
+            }
+        });
+
+        itr = (Button) v. findViewById(R.id.itrbutton);
+        itr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                g.solveIter();
             }
         });
 
@@ -69,6 +78,7 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
             solve.setVisibility(View.INVISIBLE);
             undo.setVisibility(View.INVISIBLE);
             loadGrid.setVisibility(View.INVISIBLE);
+            itr.setVisibility(View.INVISIBLE);
         }
 
         return v;
