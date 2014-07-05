@@ -17,7 +17,8 @@ import java.util.Stack;
  */
 public class Grid {
     private Panel[][] grid;
-    private static final int GRID_SIZE = 3;
+    public static final int GRID_SIZE = 4;
+    public static final double MARGIN_PERCENT = .03; // how much margin is in between the tiles
     private static final int MIN_BLACK_TILES = 2;
     private static final int MIN_WHITE_TILES = 2;
     private Stack<Integer> moves;
@@ -88,11 +89,8 @@ public class Grid {
         changePanels(panelPressed, true);
 
         if(isSolved()){ // Check and generate a new board if it's solved.
-            if (m == null) {
-                m = MediaPlayer.create(v.getContext(), R.raw.shinyding);
-            }
+            m = MediaPlayer.create(v.getContext(), R.raw.shinyding);
             m.start();
-            m.reset();
             generateBoard();
         }
     }

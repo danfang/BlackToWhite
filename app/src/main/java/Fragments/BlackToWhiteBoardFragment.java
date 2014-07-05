@@ -1,13 +1,22 @@
 package Fragments;
 
+import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 
+import com.blacktowhite.BlackToWhiteActivity;
 import com.blacktowhite.R;
 
 import Internal.Grid;
@@ -18,10 +27,9 @@ import Internal.Panel;
  * Created 6/21/2014
  * BlackToWhite Fragment
  */
-public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickListener{
+public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickListener {
+    private Fragment mFragmentContext;
     private Grid g;
-    private boolean DEBUG_MODE = true;
-
     private Button solve;
     private Button undo;
     private Button reset;
@@ -32,6 +40,7 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_black_to_white, container, false);
         g = new Grid();
+        mFragmentContext = this;
         initializeGrid(v);
 
         loadGrid = (EditText) v.findViewById(R.id.loadboardedittext);
@@ -44,7 +53,7 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
             }
         });
 
-        itr = (Button) v. findViewById(R.id.itrbutton);
+        itr = (Button) v.findViewById(R.id.itrbutton);
         itr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,7 +83,7 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
             }
         });
 
-        if (!DEBUG_MODE) {
+        if (!BlackToWhiteActivity.DEBUG_MODE) {
             solve.setVisibility(View.INVISIBLE);
             undo.setVisibility(View.INVISIBLE);
             loadGrid.setVisibility(View.INVISIBLE);
@@ -87,23 +96,53 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
 
     /**
      * Initializes the grid with Panels.
+     *
      * @param layout Layout containing all of the Buttons to construct panels.
      */
-    private void initializeGrid(View layout){
-        Button[] allButtons = new Button[]{(Button) layout.findViewById(R.id.panel1),
-                (Button) layout.findViewById(R.id.panel2), (Button) layout.findViewById(R.id
-                .panel3), (Button) layout.findViewById(R.id.panel4),
-                (Button) layout.findViewById(R.id.panel5), (Button) layout.findViewById(R.id
-                .panel6), (Button) layout.findViewById(R.id.panel7),
-                (Button) layout.findViewById(R.id.panel8), (Button) layout.findViewById(R.id
-                .panel9)};
-        for(int i = 0; i < allButtons.length; i++){
-            int row = i / g.getGrid().length;
-            int col = i % g.getGrid().length;
-            g.getGrid()[row][col] = new Panel(allButtons[i]);
-            allButtons[i].setOnClickListener(this);
-        }
-        g.generateBoard();
+    private void initializeGrid(View layout) {
+        final LinearLayout gridLayout = (LinearLayout) layout.findViewById((R.id.grid_view));
+        final TableLayout grid = (TableLayout) layout.findViewById(R.id.grid);
+        ViewTreeObserver observe = gridLayout.getViewTreeObserver();
+        observe.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int totalMarginHorizontal = (int) (gridLayout.getMeasuredWidth() * Grid.MARGIN_PERCENT);
+                int totalMarginVertical = (int) (gridLayout.getMeasuredHeight() * Grid.MARGIN_PERCENT);
+                int gridWidth = gridLayout.getMeasuredWidth(); // for debug
+                int gridHeight = gridLayout.getMeasuredHeight();
+                int singlePanelWidth = gridLayout.getMeasuredWidth() / Grid.GRID_SIZE - totalMarginHorizontal;
+                int singlePanelHeight = gridLayout.getMeasuredHeight() / Grid.GRID_SIZE - totalMarginVertical;
+                for (int i = 0; i < Grid.GRID_SIZE; i++) {
+                    TableRow row = new TableRow(getActivity());
+                    row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams
+                            .MATCH_PARENT));
+                    row.setGravity(Gravity.CENTER);
+                    for (int j = 0; j < Grid.GRID_SIZE; j++) {
+                        Button panel = new Button(getActivity());
+                        g.getGrid()[i][j] = new Panel(panel);
+                        panel.setOnClickListener(new View.OnClickListener() {
+                                                     @Override
+                                                     public void onClick(View v) {
+                                                         g.changePanels(v);
+                                                     }
+                                                 });
+                        TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams
+                                .WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+                        params.setMargins(totalMarginHorizontal / 2, totalMarginVertical / 2,
+                                totalMarginHorizontal / 2, totalMarginVertical / 2);
+                        panel.setLayoutParams(params);
+                        panel.setHeight(singlePanelHeight);
+                        panel.setWidth(singlePanelWidth);
+                        row.addView(panel);
+                    }
+                    grid.addView(row);
+                }
+                grid.requestLayout();
+                g.generateBoard();
+                gridLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
+
     }
 
     @Override
