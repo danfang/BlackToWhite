@@ -29,6 +29,14 @@
         android:layout_alignParentStart="true"
         android:layout_toLeftOf="@+id/loadboardedittext"/>
 
+    <Button
+        android:text="Change Grid Size"
+        android:id="@+id/changegridsize"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/solvebutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <LinearLayout
         android:id="@+id/grid_view"
         android:layout_width="fill_parent"
@@ -73,9 +81,10 @@
         android:layout_height="wrap_content"
         android:text="Itr"
         android:id="@+id/itrbutton"
-
+        android:layout_marginTop="10dp"
         android:layout_below="@+id/solvebutton"
-        android:layout_centerHorizontal="true"/>
+        android:layout_alignRight="@+id/speedofseekbar"
+        android:layout_alignEnd="@+id/speedofseekbar"/>
 
     <SeekBar
         android:layout_width="wrap_content"

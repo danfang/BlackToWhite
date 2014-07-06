@@ -12,9 +12,9 @@ import java.util.Random;
  * BlackToWhite Panel
  */
 public class Panel {
+    public static int panelNumber = 0;
     private Button panel;
     private boolean isWhite; // false if black
-    private static int panelNumber = 0;
     private int panelId;
     private int edgeWeight;
 

@@ -1,6 +1,7 @@
 package Fragments;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -34,6 +35,7 @@ public class BlackToWhiteBoardFragment extends Fragment {
     private Button undo;
     private Button reset;
     private Button itr;
+    private Button changeGridSize;
     private EditText loadGrid;
 
     private final boolean SHOW_MOVES = true;
@@ -42,10 +44,12 @@ public class BlackToWhiteBoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_black_to_white, container, false);
         g = new Grid();
+        Panel.panelNumber = 0;
         initializeGrid(v);
 
         loadGrid = (EditText) v.findViewById(R.id.loadboardedittext);
         mSpeedOfSolve = (SeekBar) v.findViewById(R.id.speedofseekbar);
+        changeGridSize = (Button) v.findViewById(R.id.changegridsize);
         mSpeedOfSolve.setProgress(50);
         mSpeedOfSolve.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -61,6 +65,14 @@ public class BlackToWhiteBoardFragment extends Fragment {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
+            }
+        });
+        changeGridSize.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction f = getFragmentManager().beginTransaction();
+                f.replace(R.id.container, new ChangeGridSizeFragment());
+                f.commit();
             }
         });
         solve = (Switch) v.findViewById(R.id.solvebutton);
