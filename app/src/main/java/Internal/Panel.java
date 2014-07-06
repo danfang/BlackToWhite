@@ -16,6 +16,7 @@ public class Panel {
     private boolean isWhite; // false if black
     private static int panelNumber = 0;
     private int panelId;
+    private int edgeWeight;
 
     /**
      * Constructs a new Panel. A panel is a single portion of a grid and has two states:
@@ -31,6 +32,10 @@ public class Panel {
         this.panelId = panelNumber;
         panelNumber++;
         generatePanel();
+    }
+
+    public void setEdgeWeight(int weight) {
+        edgeWeight = weight;
     }
 
     /**

@@ -8,6 +8,8 @@ import android.view.View;
 
 import com.blacktowhite.R;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 
 /**
@@ -17,7 +19,7 @@ import java.util.Stack;
  */
 public class Grid {
     private Panel[][] grid;
-    public static final int GRID_SIZE = 4;
+    public static final int GRID_SIZE = 3;
     public static final double MARGIN_PERCENT = .03; // how much margin is in between the tiles
     private static final int MIN_BLACK_TILES = 2;
     private static final int MIN_WHITE_TILES = 2;
@@ -131,9 +133,30 @@ public class Grid {
     /**
      * Runs the @solveIter() method until the board is solved
      */
-    public void solve() {
+    public void solve(boolean delay) {
         isRunning = true;
-        handleRunnable.postDelayed(runSolveAlgorithm, SOLVE_DELAY);
+        if (delay) {
+            handleRunnable.postDelayed(runSolveAlgorithm, SOLVE_DELAY);
+        } else {
+            while (!isSolved()) {
+                solveIter();
+            }
+            ArrayList<Integer> moveList = new ArrayList<Integer>();
+            while (!moves.empty()) {
+                moveList.add(0, moves.pop());
+            }
+            Log.d("moves", Arrays.toString(moveList.toArray()));
+        }
+    }
+
+    private int getBlackTiles() {
+        int blackTiles = 0;
+        for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+            if (isBlack(i) == 1) {
+                blackTiles++;
+            }
+        }
+        return blackTiles;
     }
 
     /**
@@ -141,16 +164,22 @@ public class Grid {
      * combines minimax pruning and resorts to randomization in
      * infinite-loop situations
      */
-    public void solveIter() {
-        int max = -99;
-        int index = -1;
+    public void solveIter() { // attempting heuristic evaluation
 
-        // analyzing each move to see which yields the least net black tiles
+        // heuristic 1: net black tiles
+        int minBlack = -GRID_SIZE * GRID_SIZE;
+        int minimizeBlackIndex = -1;
+
+        // heuristic 2: cornerness
+        int minCornerness = 0;
+        int minimizeCornernessIndex = -1;
+
+
         for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
             int netTiles = analyze(i);
-            if (netTiles > max && !moves.isEmpty() && i != moves.peek()) {
-                index = i;
-                max = netTiles;
+            if (netTiles > minBlack && !moves.isEmpty() && i != moves.peek()) {
+                minimizeBlackIndex = i;
+                minBlack = netTiles;
             }
         }
 
@@ -164,7 +193,7 @@ public class Grid {
 
         // if there are two black tiles on the board, the board might be stuck in
         // an infinite loop
-        if (blackTiles == 2) {
+        if (getBlackTiles() == 2) {
             stuckLength++;
         } else {
             stuckLength = 0;
@@ -175,10 +204,10 @@ public class Grid {
             changePanels(4, true);
             changePanels(8, true);
             stuckLength = 0;
-        } else if (index == -1) { // if no suitable index is found, chooses a random tile
+        } else if (minimizeBlackIndex == -1) { // if no suitable index is found, chooses a random tile
             changePanels((int) Math.random() * (GRID_SIZE * GRID_SIZE - 1), true);
         } else {                  // otherwise, switches the minimax-determined tile
-            changePanels(index, true);
+            changePanels(minimizeBlackIndex, true);
         }
         numberOfMoves++;
     }
@@ -222,7 +251,7 @@ public class Grid {
      * pre : All Panels in grid are initialized.
      * post: All Panels in grid are not all white.
      */
-    public void generateBoard(){
+    public void generateBoard() {
         randomizePanels();
     }
 
@@ -283,12 +312,20 @@ public class Grid {
         }
     }
 
+    private void calculateEdgeWeights() {
+        int maxWeight = (GRID_SIZE + 1) / 2;
+        int currentWeight = maxWeight;
+        for (int row = 0; row < GRID_SIZE; row++) {
+
+        }
+    }
+
     /**
      * Calculates the net gain of selecting the given panel
      * @param panelNumber the desired panel
      * @return (#black panels - #white panels), net gain
      */
-    private int analyze(int panelNumber){
+    private int analyze(int panelNumber) {
         int totalNetGain = 0;
         int totalGridDimensions = grid.length * grid.length;
         int panelAbove = panelNumber - GRID_SIZE;
@@ -316,7 +353,7 @@ public class Grid {
      * @param panelNumber
      * @return 1 for a black panel, -1 for a white panel
      */
-    private int isBlack(int panelNumber){
+    private int isBlack(int panelNumber) {
         int row = panelNumber / GRID_SIZE;
         int col = panelNumber % GRID_SIZE;
         if(grid[row][col].getColor()){

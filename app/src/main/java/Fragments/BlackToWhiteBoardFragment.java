@@ -36,6 +36,8 @@ public class BlackToWhiteBoardFragment extends Fragment {
     private Button itr;
     private EditText loadGrid;
 
+    private final boolean SHOW_MOVES = true;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_black_to_white, container, false);
@@ -67,7 +69,7 @@ public class BlackToWhiteBoardFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if(isChecked){
-                    g.solve();
+                    g.solve(SHOW_MOVES);
                 } else {
                     g.stopSolving();
                 }
@@ -155,6 +157,8 @@ public class BlackToWhiteBoardFragment extends Fragment {
                                 totalMarginVertical / 2, totalMarginHorizontal / 2,
                                 totalMarginVertical / 2);
                         panel.setLayoutParams(panelParams);
+//                        panel.setHeight(singlePanelHeight);
+//                        panel.setWidth(singlePanelWidth);
                         row.addView(panel);
                     }
                     grid.addView(row);
