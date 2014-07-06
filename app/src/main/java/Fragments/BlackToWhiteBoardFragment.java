@@ -1,9 +1,6 @@
 package Fragments;
 
-import android.app.ActionBar;
 import android.app.Fragment;
-import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -11,8 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 
@@ -29,7 +29,8 @@ import Internal.Panel;
  */
 public class BlackToWhiteBoardFragment extends Fragment {
     private Grid g;
-    private Button solve;
+    private Switch solve;
+    private SeekBar mSpeedOfSolve;
     private Button undo;
     private Button reset;
     private Button itr;
@@ -42,12 +43,34 @@ public class BlackToWhiteBoardFragment extends Fragment {
         initializeGrid(v);
 
         loadGrid = (EditText) v.findViewById(R.id.loadboardedittext);
-
-        solve = (Button) v.findViewById(R.id.solvebutton);
-        solve.setOnClickListener(new View.OnClickListener() {
+        mSpeedOfSolve = (SeekBar) v.findViewById(R.id.speedofseekbar);
+        mSpeedOfSolve.setProgress(50);
+        mSpeedOfSolve.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onClick(View view) {
-                g.solve();
+            public void onProgressChanged(SeekBar seekBar, int delay, boolean b) {
+                g.setSolveDelay(delay);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        solve = (Switch) v.findViewById(R.id.solvebutton);
+        solve.setChecked(false);
+        solve.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked){
+                    g.solve();
+                } else {
+                    g.stopSolving();
+                }
             }
         });
 
@@ -71,6 +94,7 @@ public class BlackToWhiteBoardFragment extends Fragment {
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                solve.setChecked(false);
                 String id = loadGrid.getText().toString();
                 if (id != "") {
                     g.generateBoard(id);
@@ -85,7 +109,8 @@ public class BlackToWhiteBoardFragment extends Fragment {
             solve.setVisibility(View.INVISIBLE);
             undo.setVisibility(View.INVISIBLE);
             loadGrid.setVisibility(View.INVISIBLE);
-            itr.setVisibility(View.INVISIBLE);
+            itr.setVisibility(View.GONE);
+            reset.setVisibility(View.INVISIBLE);
         }
 
         return v;
@@ -130,8 +155,6 @@ public class BlackToWhiteBoardFragment extends Fragment {
                                 totalMarginVertical / 2, totalMarginHorizontal / 2,
                                 totalMarginVertical / 2);
                         panel.setLayoutParams(panelParams);
-//                        panel.setHeight(singlePanelHeight);
-//                        panel.setWidth(singlePanelWidth);
                         row.addView(panel);
                     }
                     grid.addView(row);

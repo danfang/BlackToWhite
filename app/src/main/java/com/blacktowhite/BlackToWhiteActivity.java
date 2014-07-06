@@ -14,7 +14,7 @@ import Fragments.BlackToWhiteBoardFragment;
  * BlackToWhite Main Activity
  */
 public class BlackToWhiteActivity extends Activity {
-    public static boolean DEBUG_MODE = false;
+    public static boolean DEBUG_MODE = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

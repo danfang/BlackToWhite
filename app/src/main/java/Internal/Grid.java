@@ -17,19 +17,20 @@ import java.util.Stack;
  */
 public class Grid {
     private Panel[][] grid;
-    public static final int GRID_SIZE = 25;
+    public static final int GRID_SIZE = 4;
     public static final double MARGIN_PERCENT = .03; // how much margin is in between the tiles
     private static final int MIN_BLACK_TILES = 2;
     private static final int MIN_WHITE_TILES = 2;
     private Stack<Integer> moves;
     private MediaPlayer m;
     private int numberOfMoves;
-
+    private boolean isRunning;
     private int stuckLength; // preliminary cycle detection variable
 
     private Runnable runSolveAlgorithm;
     private Handler handleRunnable;
-    private final int SOLVE_DELAY = 100;
+    private int SOLVE_DELAY = 100;
+    private int MAX_DELAY = 600;
 
     public Grid(){
         grid = new Panel[GRID_SIZE][GRID_SIZE];
@@ -40,8 +41,10 @@ public class Grid {
             @Override
             public void run() {
                 solveIter();
-                if (!isSolved()) {
+                if (!isSolved() && isRunning) {
                     handleRunnable.postDelayed(this, SOLVE_DELAY);
+                } else if(!isRunning){
+                    Log.d("stopped", "stopped running the algorithm");
                 } else {
                     Log.d("solved", numberOfMoves + " moves made.");
                     numberOfMoves = 0;
@@ -129,6 +132,7 @@ public class Grid {
      * Runs the @solveIter() method until the board is solved
      */
     public void solve() {
+        isRunning = true;
         handleRunnable.postDelayed(runSolveAlgorithm, SOLVE_DELAY);
     }
 
@@ -323,6 +327,13 @@ public class Grid {
     }
 
     /**
+     * Stops running the algorithm.
+     */
+    public void stopSolving(){
+        isRunning = false;
+    }
+
+    /**
      * Stringifies the board into a series of 0s and 1s for white and black, respectively
      * @return the String id for the current board
      */
@@ -338,6 +349,13 @@ public class Grid {
             }
         }
         return id;
+    }
+
+    /**
+     * Sets solve delay
+     */
+    public void setSolveDelay(int delay){
+        SOLVE_DELAY = MAX_DELAY - delay * 8;
     }
 
 }
