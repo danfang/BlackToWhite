@@ -27,8 +27,7 @@ import Internal.Panel;
  * Created 6/21/2014
  * BlackToWhite Fragment
  */
-public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickListener {
-    private Fragment mFragmentContext;
+public class BlackToWhiteBoardFragment extends Fragment {
     private Grid g;
     private Button solve;
     private Button undo;
@@ -40,7 +39,6 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_black_to_white, container, false);
         g = new Grid();
-        mFragmentContext = this;
         initializeGrid(v);
 
         loadGrid = (EditText) v.findViewById(R.id.loadboardedittext);
@@ -126,13 +124,14 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
                                                          g.changePanels(v);
                                                      }
                                                  });
-                        TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams
-                                .WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-                        params.setMargins(totalMarginHorizontal / 2, totalMarginVertical / 2,
-                                totalMarginHorizontal / 2, totalMarginVertical / 2);
-                        panel.setLayoutParams(params);
-                        panel.setHeight(singlePanelHeight);
-                        panel.setWidth(singlePanelWidth);
+                        TableRow.LayoutParams panelParams = new TableRow.LayoutParams(singlePanelWidth,
+                                singlePanelHeight);
+                        panelParams.setMargins(totalMarginHorizontal / 2,
+                                totalMarginVertical / 2, totalMarginHorizontal / 2,
+                                totalMarginVertical / 2);
+                        panel.setLayoutParams(panelParams);
+//                        panel.setHeight(singlePanelHeight);
+//                        panel.setWidth(singlePanelWidth);
                         row.addView(panel);
                     }
                     grid.addView(row);
@@ -143,11 +142,6 @@ public class BlackToWhiteBoardFragment extends Fragment implements View.OnClickL
             }
         });
 
-    }
-
-    @Override
-    public void onClick(View v) {
-        g.changePanels(v);
     }
 
 }

@@ -17,7 +17,7 @@ import java.util.Stack;
  */
 public class Grid {
     private Panel[][] grid;
-    public static final int GRID_SIZE = 4;
+    public static final int GRID_SIZE = 25;
     public static final double MARGIN_PERCENT = .03; // how much margin is in between the tiles
     private static final int MIN_BLACK_TILES = 2;
     private static final int MIN_WHITE_TILES = 2;
