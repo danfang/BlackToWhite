@@ -109,13 +109,16 @@ public class BlackToWhiteBoardFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 solve.setChecked(false);
-                String id = loadGrid.getText().toString();
-                if (id != "") {
-                    g.generateBoard(id);
-                    loadGrid.setText("");
-                } else {
-                    g.generateBoard();
-                }
+                mSpeedOfSolve.setProgress(50);
+//                String id = loadGrid.getText().toString();
+//                if (id != "") {
+//                    g.generateBoard(id);
+//                    loadGrid.setText("");
+//                } else {
+//                    g.generateBoard();
+//                }
+                g.resetToBlack();
+                g.randomTilePresses(100);
             }
         });
 
@@ -129,6 +132,9 @@ public class BlackToWhiteBoardFragment extends Fragment {
 
         return v;
     }
+
+
+
 
 
     /**

@@ -388,10 +388,32 @@ public class Grid {
     }
 
     /**
-     * Sets solve delay
+     * Sets solve delay.
+     * @param delay How much of a delay there will be between iterations.
      */
     public void setSolveDelay(int delay){
         SOLVE_DELAY = MAX_DELAY - delay * 8;
+    }
+
+    /**
+     * Used for debugging, sets the entire grid back to black.
+     */
+    public void resetToBlack(){
+        for(Panel[] row : grid){
+            for(Panel p : row){
+                p.changeColor(false);
+            }
+        }
+    }
+
+    /**
+     * Used for debugging, performs n amount of tile presses
+     * @param times The amount of random tile presses the Grid will do.
+     */
+    public void randomTilePresses(int times){
+        for(int i = 0; i < times; i++){
+            changePanels((int) (Math.random() * Panel.panelNumber), false);
+        }
     }
 
 }
