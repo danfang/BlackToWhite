@@ -32,16 +32,30 @@ public class Panel {
         this.panelId = panelNumber;
         panelNumber++;
         generatePanel();
+        panel.setTextColor(Color.GRAY);
     }
 
+    /**
+     * Sets the initial edge weight
+     * @param weight
+     */
     public void setEdgeWeight(int weight) {
         edgeWeight = weight;
+    }
+
+    /**
+     * @return the edge weight, which is positive if the tile is white (creates edge-black panels),
+     * and negative if the tile is black (does not create edge-black panels)
+     */
+    public int getEdgeWeight() {
+        return isWhite ? edgeWeight: -edgeWeight;
     }
 
     /**
      * Decides whether or not if it's black or white. By default the panel is black.
      */
     protected void generatePanel() {
+        panel.setTextColor(Color.GRAY);
         Random r = new Random();
         isWhite = r.nextBoolean();
         if (isWhite) {
@@ -75,6 +89,14 @@ public class Panel {
      */
     protected boolean getColor(){
         return isWhite;
+    }
+
+    /**
+     * Sets the internal text for the panel
+     * @param s the desired panel text
+     */
+    public void setText(String s) {
+        panel.setText(s);
     }
 
     /**

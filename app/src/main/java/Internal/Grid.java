@@ -19,7 +19,7 @@ import java.util.Stack;
  */
 public class Grid {
     private Panel[][] grid;
-    public static int GRID_SIZE = 3;
+    public static final int GRID_SIZE = 3;
     public static final double MARGIN_PERCENT = .03; // how much margin is in between the tiles
     private static final int MIN_BLACK_TILES = 2;
     private static final int MIN_WHITE_TILES = 2;
@@ -32,6 +32,9 @@ public class Grid {
     private Handler handleRunnable;
     private int SOLVE_DELAY = 100;
     private int MAX_DELAY = 600;
+
+    private static double conversionWeight = 1;
+    private static double edgeWeight = 0.05;
 
     public Grid(){
         grid = new Panel[GRID_SIZE][GRID_SIZE];
@@ -53,10 +56,7 @@ public class Grid {
                 }
             }
         };
-
-
     }
-
 
     /**
      * Get method for retrieving the grid.
@@ -91,7 +91,6 @@ public class Grid {
     public void changePanels(View v){
         int panelPressed = identifyPanel(v);
         changePanels(panelPressed, true);
-
         if(isSolved()){ // Check and generate a new board if it's solved.
             m = MediaPlayer.create(v.getContext(), R.raw.shinyding);
             m.start();
@@ -148,6 +147,9 @@ public class Grid {
         }
     }
 
+    /**
+     * @return the count of black tiles
+     */
     private int getBlackTiles() {
         int blackTiles = 0;
         for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
@@ -165,20 +167,14 @@ public class Grid {
      */
     public void solveIter() { // attempting heuristic evaluation
 
-        // heuristic 1: net black tiles
-        int minBlack = -GRID_SIZE * GRID_SIZE;
-        int minimizeBlackIndex = -1;
-
-        // heuristic 2: cornerness
-        int minCornerness = 0;
-        int minimizeCornernessIndex = -1;
-
+        double maxScore = -1000;
+        int index = -1;
 
         for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
-            int netTiles = analyze(i);
-            if (netTiles > minBlack && !moves.isEmpty() && i != moves.peek()) {
-                minimizeBlackIndex = i;
-                minBlack = netTiles;
+            double score = analyze(i);
+            if (score > maxScore && !moves.isEmpty() && i != moves.peek()) {
+                index = i;
+                maxScore = score;
             }
         }
 
@@ -203,10 +199,10 @@ public class Grid {
             changePanels(4, true);
             changePanels(8, true);
             stuckLength = 0;
-        } else if (minimizeBlackIndex == -1) { // if no suitable index is found, chooses a random tile
+        } else if (index == -1) { // if no suitable index is found, chooses a random tile
             changePanels((int) Math.random() * (GRID_SIZE * GRID_SIZE - 1), true);
         } else {                  // otherwise, switches the minimax-determined tile
-            changePanels(minimizeBlackIndex, true);
+            changePanels(index, true);
         }
         numberOfMoves++;
     }
@@ -252,6 +248,7 @@ public class Grid {
      */
     public void generateBoard() {
         randomizePanels();
+        calculateEdgeWeights();
     }
 
     /**
@@ -312,10 +309,32 @@ public class Grid {
     }
 
     private void calculateEdgeWeights() {
-        int maxWeight = (GRID_SIZE + 1) / 2;
+        int maxWeight = (GRID_SIZE % 2 == 1) ? GRID_SIZE: GRID_SIZE - 1;
         int currentWeight = maxWeight;
         for (int row = 0; row < GRID_SIZE; row++) {
-
+            for (int col = 0; col < GRID_SIZE; col++) {
+                grid[row][col].setEdgeWeight(currentWeight);
+                if (col != GRID_SIZE - 1) {
+                    if (GRID_SIZE % 2 == 1) { // odd
+                        currentWeight = col < GRID_SIZE / 2 ? currentWeight - 1 : currentWeight + 1;
+                    } else { // even
+                        if (col < GRID_SIZE / 2 - 1) {
+                            currentWeight--;
+                        } else if (col > GRID_SIZE / 2 - 1) {
+                            currentWeight++;
+                        }
+                    }
+                }
+            }
+            if (GRID_SIZE % 2 == 1) { // odd
+                currentWeight = row < GRID_SIZE / 2 ? currentWeight - 1: currentWeight + 1;
+            } else { // even
+                if (row < GRID_SIZE / 2 - 1) {
+                    currentWeight--;
+                } else if (row > GRID_SIZE / 2 - 1) {
+                    currentWeight++;
+                }
+            }
         }
     }
 
@@ -324,27 +343,43 @@ public class Grid {
      * @param panelNumber the desired panel
      * @return (#black panels - #white panels), net gain
      */
-    private int analyze(int panelNumber) {
-        int totalNetGain = 0;
-        int totalGridDimensions = grid.length * grid.length;
+    private double analyze(int panelNumber) {
+        double score = 0;
+        int totalGridDimensions = GRID_SIZE * GRID_SIZE;
         int panelAbove = panelNumber - GRID_SIZE;
         int panelBelow = panelNumber + GRID_SIZE;
         int panelRight = panelNumber + 1;
         int panelLeft = panelNumber - 1;
+
+        //heuristic 1: conversion score
+        int conversionScore = isBlack(panelNumber);
+
+        //heuristic 2: edge score
+        int edgeScore = getPanelEdgeScore(panelNumber);
+
         if (panelAbove >= 0) {
-            totalNetGain += isBlack(panelAbove);
+            conversionScore += isBlack(panelAbove);
+            edgeScore += getPanelEdgeScore(panelAbove);
         }
         if (panelBelow < totalGridDimensions) {
-            totalNetGain += isBlack(panelBelow);
+            conversionScore += isBlack(panelBelow);
+            edgeScore += getPanelEdgeScore(panelBelow);
+
         }
-        if (panelRight % grid.length != 0 && panelRight < totalGridDimensions){
-            totalNetGain += isBlack(panelRight);
+        if (panelRight % GRID_SIZE != 0 && panelRight < totalGridDimensions){
+            conversionScore += isBlack(panelRight);
+            edgeScore += getPanelEdgeScore(panelRight);
         }
-        if (panelNumber % grid.length != 0 && panelLeft >= 0){
-            totalNetGain += isBlack(panelLeft);
+        if (panelNumber % GRID_SIZE != 0 && panelLeft >= 0){
+            conversionScore += isBlack(panelLeft);
+            edgeScore += getPanelEdgeScore(panelLeft);
         }
-        totalNetGain += isBlack(panelNumber);
-        return totalNetGain;
+        int row = panelNumber / GRID_SIZE;
+        int col = panelNumber % GRID_SIZE;
+
+        score = (conversionWeight * conversionScore) + (edgeWeight * edgeScore);
+        grid[row][col].setText("T: " + score + " C: " + conversionWeight * conversionScore + " E: " + edgeWeight * edgeScore);
+        return score;
     }
 
     /**
@@ -360,6 +395,16 @@ public class Grid {
         } else {
             return 1;
         }
+    }
+
+    /**
+     * @param panelNumber the desired panel
+     * @return the edge weight of the given panelNumber
+     */
+    private int getPanelEdgeScore(int panelNumber) {
+        int row = panelNumber / GRID_SIZE;
+        int col = panelNumber % GRID_SIZE;
+        return grid[row][col].getEdgeWeight();
     }
 
     /**
